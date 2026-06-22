@@ -4,7 +4,7 @@ ARG VERSION=dev
 ARG REVISION=dev
 
 RUN echo 'nobody:x:65534:65534:Nobody:/:' > /tmp/passwd && \
-    apk add --no-cache upx=5.0.2-r0
+    apk add --no-cache upx
 
 WORKDIR /src
 
