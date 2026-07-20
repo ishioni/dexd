@@ -68,6 +68,9 @@ func TestLoadDefaultsPolicyAndInterval(t *testing.T) {
 	if got.MetricsAddr != ":8080" {
 		t.Fatalf("MetricsAddr = %q, want :8080", got.MetricsAddr)
 	}
+	if got.OwnerID != "dexd" {
+		t.Fatalf("OwnerID = %q, want dexd", got.OwnerID)
+	}
 }
 
 func TestLoadDefaultTTL(t *testing.T) {

@@ -1,11 +1,8 @@
-// Package registry implements an external-dns-compatible TXT ownership registry.
+// Package registry implements dexd TXT ownership tracking.
 // For every A record we manage at foo.example.com, we maintain a companion TXT
 // record at a-foo.example.com with value:
 //
-//	heritage=external-dns,external-dns/owner=<ownerID>,external-dns/resource=<resource>
-//
-// This is wire-compatible with kubernetes-sigs/external-dns using --txt-prefix=%{record_type}-,
-// so a Kubernetes external-dns instance with a different owner ID can coexist safely.
+//	heritage=dexd,dexd/owner=<ownerID>,dexd/resource=<resource>
 package registry
 
 import (
@@ -14,7 +11,9 @@ import (
 )
 
 const (
-	heritage         = "external-dns"
+	heritage         = "dexd"
+	ownerField       = "dexd/owner"
+	resourceField    = "dexd/resource"
 	wildcardTXTLabel = "wildcard-dexd"
 	wildcardDNSLabel = "*"
 )
@@ -82,34 +81,33 @@ func decodeTXTKeyHostname(hostname string) string {
 // EncodeTXT produces the TXT record value for an ownership record.
 // UniFi requires the value to be double-quoted when it contains commas.
 func EncodeTXT(ownerID, resource string) string {
-	return fmt.Sprintf(`"heritage=%s,external-dns/owner=%s,external-dns/resource=%s"`,
-		heritage, ownerID, resource)
+	return fmt.Sprintf(`"heritage=%s,%s=%s,%s=%s"`,
+		heritage, ownerField, ownerID, resourceField, resource)
 }
 
 // DecodeTXT parses the TXT record value. Returns (record, true) if it is a
-// valid external-dns ownership record, (zero, false) otherwise.
+// valid dexd ownership record, (zero, false) otherwise.
 func DecodeTXT(value string) (OwnershipRecord, bool) {
 	// Strip surrounding quotes that UniFi stores/returns.
 	value = strings.Trim(value, `"`)
 
-	if !strings.Contains(value, "heritage="+heritage) {
-		return OwnershipRecord{}, false
-	}
-
 	var rec OwnershipRecord
+	validHeritage := false
 	for _, part := range strings.Split(value, ",") {
 		k, v, ok := strings.Cut(part, "=")
 		if !ok {
 			continue
 		}
 		switch k {
-		case "external-dns/owner":
+		case "heritage":
+			validHeritage = v == heritage
+		case ownerField:
 			rec.OwnerID = v
-		case "external-dns/resource":
+		case resourceField:
 			rec.Resource = v
 		}
 	}
-	if rec.OwnerID == "" {
+	if !validHeritage || rec.OwnerID == "" {
 		return OwnershipRecord{}, false
 	}
 	return rec, true

@@ -15,10 +15,6 @@ const (
 	labelDexdRouterPrefix = "dexd.routers."
 	labelDexdHostsPrefix  = "dexd.hosts."
 
-	labelLegacyExternalDNSEnable       = "external-dns.enabled"
-	labelLegacyExternalDNSTarget       = "external-dns.target"
-	labelLegacyExternalDNSRouterPrefix = "external-dns.routers."
-
 	labelRouterRulePrefix = "traefik.http.routers."
 	labelRouterRuleSuffix = ".rule"
 )
@@ -59,7 +55,7 @@ func EndpointsFromLabels(containerName string, labels map[string]string, default
 		skipSet      bool
 	}
 
-	containerTarget := firstLabelValue(labels, labelDexdTarget, labelLegacyExternalDNSTarget)
+	containerTarget := labels[labelDexdTarget]
 	routerRules := make(map[string]string)
 	routerOverrides := make(map[string]routerOverride)
 	hostBlocks := make(map[string]hostBlock)
@@ -71,17 +67,7 @@ func EndpointsFromLabels(containerName string, labels map[string]string, default
 			continue
 		}
 
-		if routerName, field, legacy, ok := parseRouterLabel(key); ok {
-			if legacy {
-				existing := routerOverrides[routerName]
-				if (field == "target" && existing.targetSet) ||
-					(field == "skip" && existing.skipSet) ||
-					field == "hostnames" ||
-					field == "extra-hostnames" {
-					continue
-				}
-			}
-
+		if routerName, field, ok := parseRouterLabel(key); ok {
 			ro := routerOverrides[routerName]
 			switch field {
 			case "target":
@@ -246,28 +232,11 @@ func sortedKeys(values map[string]string) []string {
 }
 
 func enabled(labels map[string]string) bool {
-	if val, ok := labels[labelDexdEnable]; ok {
-		return isTrue(val)
-	}
-	return isTrue(labels[labelLegacyExternalDNSEnable])
+	return isTrue(labels[labelDexdEnable])
 }
 
-func firstLabelValue(labels map[string]string, keys ...string) string {
-	for _, key := range keys {
-		if val := labels[key]; val != "" {
-			return val
-		}
-	}
-	return ""
-}
-
-func parseRouterLabel(key string) (name, field string, legacy, ok bool) {
-	name, field, ok = parseNamedLabel(key, labelDexdRouterPrefix)
-	if !ok {
-		name, field, ok = parseNamedLabel(key, labelLegacyExternalDNSRouterPrefix)
-		legacy = ok
-	}
-	return name, field, legacy, ok
+func parseRouterLabel(key string) (name, field string, ok bool) {
+	return parseNamedLabel(key, labelDexdRouterPrefix)
 }
 
 func parseNamedLabel(key, prefix string) (name, field string, ok bool) {

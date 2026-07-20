@@ -3,16 +3,16 @@
 This file documents the implementation status, design decisions, known gaps, and
 suggested next steps. Update it as work progresses.
 
-## Status: v0.3 — dexd rename (2026-05-11)
+## Status: v0.4 — native dexd ownership and labels (2026-07-20)
 
-The core pipeline is implemented and covered by an automated test suite (`go test -race ./...`). It now supports A and CNAME records, container-level target/type defaults, per-Traefik-router target/type/skip overrides, strict UniFi HTTP contract tests that exercise the real UniFi client against an in-process API simulator, external-dns-style change policies, Prometheus metrics on `/metrics`, and the `dexd` project/binary/label identity.
+The core pipeline is implemented and covered by an automated test suite (`go test -race ./...`). It supports A and CNAME records, container-level target/type defaults, per-Traefik-router target/type/skip overrides, strict UniFi HTTP contract tests that exercise the real UniFi client against an in-process API simulator, safe DNS change policies, Prometheus metrics on `/metrics`, and native `dexd` labels and TXT ownership.
 
 Two real-world bugs were caught during manual testing and are now regression-guarded by tests:
 
 - UniFi rejects TXT records that include a `ttl` field. Fix: `internal/provider/unifi/client.go` skips TTL when `RecordType == "TXT"`. Guard: `TestCreateTXT_OmitsTTL`.
 - UniFi's automatic TTL is represented by omitting `ttl` from A/CNAME request bodies. `DEFAULT_TTL=auto` is the default; set a positive integer to force a TTL.
 - UniFi rejects TXT values containing unquoted commas. Fix: `internal/registry/txt.go` wraps the encoded value in `"..."`, strips on decode. Guard: `TestEncodeTXT_IsQuoted` + `TestDecodeTXT_StripsQuotes`.
-- The old `external-dns.*` Docker labels remain accepted as compatibility aliases. Prefer `dexd.*`; when both are present, `dexd.*` wins.
+- The breaking v0.4 identity cleanup accepts only `dexd.*` Docker labels and recognizes only native `dexd` TXT ownership records.
 
 The core pipeline:
 
@@ -36,7 +36,7 @@ Docker daemon → label parser → plan → UniFi static-DNS
 | `internal/provider/unifi/client.go`             | HTTP client for UniFi static-dns CRUD                                               |
 | `internal/provider/unifi/errors.go`             | Typed UniFi API/network/data errors                                                 |
 | `internal/provider/unifi/client_test.go`        | Strict UniFi API simulator tests via `httptest.NewServer`                           |
-| `internal/registry/txt.go`                      | external-dns-compatible TXT ownership encode/decode                                 |
+| `internal/registry/txt.go`                      | Native dexd TXT ownership encode/decode                                             |
 | `internal/plan/plan.go`                         | Diffs desired vs current, produces Changes                                          |
 | `internal/controller/controller.go`             | Reconcile loop with event debounce + periodic ticker                                |
 | `internal/controller/types.go`                  | `Source` and `Provider` interfaces + domain `Event` type                            |
@@ -70,8 +70,8 @@ Docker daemon → label parser → plan → UniFi static-DNS
 
 - **Auth**: X-Api-Key PAT only (UniFi Network 9.0+). No username/password fallback to keep the surface small. Add it later if needed.
 - **Record type**: Inferred automatically from the resolved target — IPv4 → A, anything else → CNAME (AAAA explicitly out of scope). No `record-type` label exists; the target string is the single source of truth.
-- **Opt-in labels**: Only `dexd.enabled=true` is required. The legacy `external-dns.enabled=true` label remains supported as an alias. Hostname extraction still reads Traefik router rules, but `traefik.enable=true` is no longer a gate.
-- **TXT prefix**: Optional global `TXT_PREFIX` env var (default `""`). The full TXT key is `{TXT_PREFIX}{record_type_lowercase}-{hostname}`, e.g. with `TXT_PREFIX=talos.` the companion TXT for `postgres.example.com` lives at `talos.a-postgres.example.com`. An empty prefix gives the legacy `a-foo.example.com` format, which is wire-compatible with kubernetes-sigs/external-dns using `--txt-prefix=%{record_type}-`. The `TXT_OWNER` env var (default `docker-external-dns`) identifies which records this agent owns; keep this default for migrated installs so pre-rename records remain owned.
+- **Opt-in labels**: Only `dexd.enabled=true` is required. Hostname extraction reads Traefik router rules, but `traefik.enable=true` is not a gate.
+- **TXT ownership**: Optional global `TXT_PREFIX` env var (default `""`) is prepended to TXT record names. For example, with `TXT_PREFIX=talos.`, the companion TXT for `postgres.example.com` is `talos.a-postgres.example.com`; without a prefix it is `a-postgres.example.com`. `TXT_OWNER` defaults to `dexd` and scopes the records owned by an instance.
 - **Policy**: `POLICY` defaults to `sync`. `sync` applies creates, updates, replacements, stale deletes, and orphan TXT cleanup. `upsert-only` applies creates, updates, and owned A/CNAME replacements, but skips stale deletes and orphan TXT cleanup. `create-only` applies only creates.
 - **Metrics**: `METRICS_ADDR` defaults to `:8080` and exposes Prometheus metrics at `/metrics`. Set it to an empty string to disable the metrics HTTP server.
 - **Ownership safety**: Records without matching owner TXT are never deleted.
@@ -118,24 +118,24 @@ UniFi endpoint: `POST /proxy/network/v2/api/site/{site}/static-dns`
 TXT ownership value:
 
 ```
-heritage=external-dns,external-dns/owner=docker-external-dns,external-dns/resource=docker/myapp
+heritage=dexd,dexd/owner=dexd,dexd/resource=docker/myapp
 ```
 
-Source for UniFi wire format: https://github.com/kashalls/external-dns-unifi-webhook
+The request shape is verified by the strict in-process UniFi API simulator in `internal/provider/unifi/client_test.go`.
 
 ## Test coverage
 
 Run with `make test` or `go test -race ./...`. All tests use stdlib only (no testcontainers, no Docker daemon or real UniFi controller needed).
 
-| Package                    | What it covers                                                                                                                                                                                                                                                                                                                                                |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `internal/source`          | Label → endpoint extraction: enable-flag gating, `dexd.*` label vocabulary with legacy `external-dns.*` aliases, standalone host blocks, single/multi `Host()`, `\|\|` joining, router hostname override/append labels, `HostRegexp` skip, unsubstituted `${VAR}` skip, multi-router merging, container/router target and record-type overrides, router skip. |
-| `internal/registry`        | `TXTKey` and `ParseTXTKey` formatting/parsing, `EncodeTXT` always quoted, `DecodeTXT` round-trip + quote stripping, rejects non-heritage values, `IsOwnedBy` cross-owner matrix.                                                                                                                                                                              |
-| `internal/plan`            | All Create/Update/Delete/Replace branches for A and CNAME plus the three safety rules: no update without our TXT, no update if TXT belongs to another owner, no delete without our TXT.                                                                                                                                                                       |
-| `internal/provider/unifi`  | HTTP wire format: list shape, `_id`, `X-Api-Key`, `Accept`, `Content-Type`, A/CNAME omit `ttl` for auto or include configured numeric TTL, **TXT omits `ttl`**, PUT/DELETE URLs, typed API/network/data errors, dry-run makes no mutation calls.                                                                                                              |
-| `internal/controller`      | Reconcile → apply flow: create/update/delete record+TXT pairs, CNAME pair creation, all three ownership safety rules, error-continues behaviour, debounce → reconcile event path, and integration tests through the real UniFi client against a strict fake UniFi API.                                                                                        |
-| `internal/metrics`         | Prometheus handler and metrics for reconcile health, plan/change counts, source events, provider requests, provider errors, and build/config info.                                                                                                                                                                                                            |
-| `internal/source` (docker) | Endpoints aggregation across multiple containers, name slash-stripping, ID fallback, list error propagation, event filter correctness, channel pass-through.                                                                                                                                                                                                  |
+| Package                    | What it covers                                                                                                                                                                                                                                                                                                              |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `internal/source`          | Label → endpoint extraction: `dexd.*` enable-flag gating and label vocabulary, standalone host blocks, single/multi `Host()`, `\|\|` joining, router hostname override/append labels, `HostRegexp` skip, unsubstituted `${VAR}` skip, multi-router merging, container/router target and record-type overrides, router skip. |
+| `internal/registry`        | `TXTKey` and `ParseTXTKey` formatting/parsing, `EncodeTXT` always quoted, `DecodeTXT` round-trip + quote stripping, rejects non-heritage values, `IsOwnedBy` cross-owner matrix.                                                                                                                                            |
+| `internal/plan`            | All Create/Update/Delete/Replace branches for A and CNAME plus the three safety rules: no update without our TXT, no update if TXT belongs to another owner, no delete without our TXT.                                                                                                                                     |
+| `internal/provider/unifi`  | HTTP wire format: list shape, `_id`, `X-Api-Key`, `Accept`, `Content-Type`, A/CNAME omit `ttl` for auto or include configured numeric TTL, **TXT omits `ttl`**, PUT/DELETE URLs, typed API/network/data errors, dry-run makes no mutation calls.                                                                            |
+| `internal/controller`      | Reconcile → apply flow: create/update/delete record+TXT pairs, CNAME pair creation, all three ownership safety rules, error-continues behaviour, debounce → reconcile event path, and integration tests through the real UniFi client against a strict fake UniFi API.                                                      |
+| `internal/metrics`         | Prometheus handler and metrics for reconcile health, plan/change counts, source events, provider requests, provider errors, and build/config info.                                                                                                                                                                          |
+| `internal/source` (docker) | Endpoints aggregation across multiple containers, name slash-stripping, ID fallback, list error propagation, event filter correctness, channel pass-through.                                                                                                                                                                |
 
 ## Known gaps / future work
 
