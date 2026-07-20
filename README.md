@@ -48,32 +48,32 @@ docker compose up -d
 
 ## Configuration
 
-| Environment variable | Default | Description |
-| --- | --- | --- |
-| `UNIFI_HOST` | **required** | UniFi controller URL, e.g. `https://10.1.2.1` |
-| `UNIFI_API_KEY` | **required** | Personal Access Token from UniFi Network |
-| `DEFAULT_TARGET` | **required** | Default target. IPv4 → A record, hostname → CNAME |
-| `UNIFI_SITE` | `default` | UniFi site name |
-| `UNIFI_INSECURE_SKIP_VERIFY` | `true` | Skip TLS verification (self-signed certs) |
-| `TXT_OWNER` | `docker-external-dns` | Scopes TXT ownership; change if running multiple instances |
-| `TXT_PREFIX` | empty | Optional prefix for ownership TXT record names |
-| `POLICY` | `sync` | Change policy: `sync`, `upsert-only`, or `create-only` |
-| `DEFAULT_TTL` | `auto` | TTL for created A/CNAME records. Use `auto` to let UniFi choose, or a positive integer. |
-| `RECONCILE_INTERVAL` | `5m` | How often to run a full reconcile |
-| `LOG_LEVEL` | `info` | `debug`, `info`, `warn`, or `error` |
-| `LOG_FORMAT` | `text` | `text` or `json` |
-| `DRY_RUN` | `false` | List current UniFi records and log planned changes without mutating UniFi |
-| `METRICS_ADDR` | `:8080` | Address for the Prometheus metrics HTTP server. Empty disables metrics. |
+| Environment variable         | Default               | Description                                                                             |
+| ---------------------------- | --------------------- | --------------------------------------------------------------------------------------- |
+| `UNIFI_HOST`                 | **required**          | UniFi controller URL, e.g. `https://10.1.2.1`                                           |
+| `UNIFI_API_KEY`              | **required**          | Personal Access Token from UniFi Network                                                |
+| `DEFAULT_TARGET`             | **required**          | Default target. IPv4 → A record, hostname → CNAME                                       |
+| `UNIFI_SITE`                 | `default`             | UniFi site name                                                                         |
+| `UNIFI_INSECURE_SKIP_VERIFY` | `true`                | Skip TLS verification (self-signed certs)                                               |
+| `TXT_OWNER`                  | `docker-external-dns` | Scopes TXT ownership; change if running multiple instances                              |
+| `TXT_PREFIX`                 | empty                 | Optional prefix for ownership TXT record names                                          |
+| `POLICY`                     | `sync`                | Change policy: `sync`, `upsert-only`, or `create-only`                                  |
+| `DEFAULT_TTL`                | `auto`                | TTL for created A/CNAME records. Use `auto` to let UniFi choose, or a positive integer. |
+| `RECONCILE_INTERVAL`         | `5m`                  | How often to run a full reconcile                                                       |
+| `LOG_LEVEL`                  | `info`                | `debug`, `info`, `warn`, or `error`                                                     |
+| `LOG_FORMAT`                 | `text`                | `text` or `json`                                                                        |
+| `DRY_RUN`                    | `false`               | List current UniFi records and log planned changes without mutating UniFi               |
+| `METRICS_ADDR`               | `:8080`               | Address for the Prometheus metrics HTTP server. Empty disables metrics.                 |
 
 ### Policy
 
 `POLICY` controls which planned changes are applied:
 
-| Policy | Creates | Updates | A/CNAME replacements | Deletes |
-| --- | --- | --- | --- | --- |
-| `sync` | yes | yes | yes | yes |
-| `upsert-only` | yes | yes | yes | no stale-record or orphan-TXT cleanup |
-| `create-only` | yes | no | no | no |
+| Policy        | Creates | Updates | A/CNAME replacements | Deletes                               |
+| ------------- | ------- | ------- | -------------------- | ------------------------------------- |
+| `sync`        | yes     | yes     | yes                  | yes                                   |
+| `upsert-only` | yes     | yes     | yes                  | no stale-record or orphan-TXT cleanup |
+| `create-only` | yes     | no      | no                   | no                                    |
 
 `upsert-only` allows A/CNAME replacements because they are updates by intent. UniFi may require deleting the old owned record before creating the replacement record with the same hostname.
 
@@ -135,7 +135,7 @@ A container-level target override applies to every router from that container:
 ```yaml
 labels:
   dexd.enabled: "true"
-  dexd.target: "traefik.example.com"   # hostname → CNAME for all routers
+  dexd.target: "traefik.example.com" # hostname → CNAME for all routers
 ```
 
 Per-router target overrides take precedence, and each router's type is detected independently:
