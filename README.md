@@ -6,10 +6,8 @@ External DNS, but for Docker!
 automatically creates/removes static DNS records on a **UniFi OS local
 controller** (UDM/UDR/UDM-Pro) for services exposed via Traefik.
 
-It mirrors the ownership-tracking model of
-[kubernetes-sigs/external-dns](https://github.com/kubernetes-sigs/external-dns),
-so it can safely coexist with a Kubernetes external-dns instance pointing at
-the same UniFi controller.
+It uses TXT ownership records so it can safely coexist with other DNS
+automation pointing at the same UniFi controller.
 
 ## How it works
 
@@ -27,11 +25,11 @@ For every managed record at `foo.example.com`, a TXT record is created at
 `{record_type}-foo.example.com` with value:
 
 ```text
-heritage=external-dns,external-dns/owner=<TXT_OWNER>,external-dns/resource=docker/<container-name>
+heritage=dexd,dexd/owner=<TXT_OWNER>,dexd/resource=docker/<container-name>
 ```
 
-Records **without** a matching ownership TXT are never touched — externally
-created records are safe.
+Records **without** a matching ownership TXT are never touched — records
+created outside dexd are safe.
 
 ## Deployment
 
@@ -48,22 +46,22 @@ docker compose up -d
 
 ## Configuration
 
-| Environment variable         | Default               | Description                                                                             |
-| ---------------------------- | --------------------- | --------------------------------------------------------------------------------------- |
-| `UNIFI_HOST`                 | **required**          | UniFi controller URL, e.g. `https://10.1.2.1`                                           |
-| `UNIFI_API_KEY`              | **required**          | Personal Access Token from UniFi Network                                                |
-| `DEFAULT_TARGET`             | **required**          | Default target. IPv4 → A record, hostname → CNAME                                       |
-| `UNIFI_SITE`                 | `default`             | UniFi site name                                                                         |
-| `UNIFI_INSECURE_SKIP_VERIFY` | `true`                | Skip TLS verification (self-signed certs)                                               |
-| `TXT_OWNER`                  | `docker-external-dns` | Scopes TXT ownership; change if running multiple instances                              |
-| `TXT_PREFIX`                 | empty                 | Optional prefix for ownership TXT record names                                          |
-| `POLICY`                     | `sync`                | Change policy: `sync`, `upsert-only`, or `create-only`                                  |
-| `DEFAULT_TTL`                | `auto`                | TTL for created A/CNAME records. Use `auto` to let UniFi choose, or a positive integer. |
-| `RECONCILE_INTERVAL`         | `5m`                  | How often to run a full reconcile                                                       |
-| `LOG_LEVEL`                  | `info`                | `debug`, `info`, `warn`, or `error`                                                     |
-| `LOG_FORMAT`                 | `text`                | `text` or `json`                                                                        |
-| `DRY_RUN`                    | `false`               | List current UniFi records and log planned changes without mutating UniFi               |
-| `METRICS_ADDR`               | `:8080`               | Address for the Prometheus metrics HTTP server. Empty disables metrics.                 |
+| Environment variable         | Default      | Description                                                                             |
+| ---------------------------- | ------------ | --------------------------------------------------------------------------------------- |
+| `UNIFI_HOST`                 | **required** | UniFi controller URL, e.g. `https://10.1.2.1`                                           |
+| `UNIFI_API_KEY`              | **required** | Personal Access Token from UniFi Network                                                |
+| `DEFAULT_TARGET`             | **required** | Default target. IPv4 → A record, hostname → CNAME                                       |
+| `UNIFI_SITE`                 | `default`    | UniFi site name                                                                         |
+| `UNIFI_INSECURE_SKIP_VERIFY` | `true`       | Skip TLS verification (self-signed certs)                                               |
+| `TXT_OWNER`                  | `dexd`       | Scopes TXT ownership; change if running multiple instances                              |
+| `TXT_PREFIX`                 | empty        | Optional prefix for ownership TXT record names                                          |
+| `POLICY`                     | `sync`       | Change policy: `sync`, `upsert-only`, or `create-only`                                  |
+| `DEFAULT_TTL`                | `auto`       | TTL for created A/CNAME records. Use `auto` to let UniFi choose, or a positive integer. |
+| `RECONCILE_INTERVAL`         | `5m`         | How often to run a full reconcile                                                       |
+| `LOG_LEVEL`                  | `info`       | `debug`, `info`, `warn`, or `error`                                                     |
+| `LOG_FORMAT`                 | `text`       | `text` or `json`                                                                        |
+| `DRY_RUN`                    | `false`      | List current UniFi records and log planned changes without mutating UniFi               |
+| `METRICS_ADDR`               | `:8080`      | Address for the Prometheus metrics HTTP server. Empty disables metrics.                 |
 
 ### Policy
 
@@ -191,15 +189,12 @@ continues applying supported records. Wildcard A records are supported; their
 ownership TXT record replaces the `*` label with `wildcard-dexd` so UniFi
 accepts the TXT hostname.
 
-### Rename compatibility
+### Native ownership and labels
 
-`dexd` still accepts the old `external-dns.*` Docker labels as compatibility
-aliases. Prefer `dexd.*` for new deployments; if both are present, `dexd.*`
-wins.
-
-The default `TXT_OWNER` remains `docker-external-dns` so existing records
-created before the rename are still recognized. Change it only if you are
-starting from a clean zone or intentionally want a separate ownership scope.
+`dexd` accepts only `dexd.*` labels and writes native `dexd` ownership TXT
+records. Records created by versions before this breaking change are not
+considered owned and must be removed or migrated manually before using
+`POLICY=sync`.
 
 ## Getting a UniFi PAT
 

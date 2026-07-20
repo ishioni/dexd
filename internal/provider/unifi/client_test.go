@@ -250,7 +250,7 @@ func TestListRecords(t *testing.T) {
 	api := newStrictUniFiServer(t,
 		DNSRecord{ID: "a1", Key: "foo.example.com", RecordType: "A", Value: "10.0.0.1", TTL: 300, Enabled: true},
 		DNSRecord{ID: "c1", Key: "alias.example.com", RecordType: "CNAME", Value: "target.example.com", TTL: 300, Enabled: true},
-		DNSRecord{ID: "t1", Key: "a-foo.example.com", RecordType: "TXT", Value: `"heritage=external-dns"`, Enabled: true},
+		DNSRecord{ID: "t1", Key: "a-foo.example.com", RecordType: "TXT", Value: `"heritage=dexd"`, Enabled: true},
 	)
 
 	got, err := api.client(false).ListRecords(context.Background())
@@ -365,7 +365,7 @@ func TestCreateTXT_OmitsTTL(t *testing.T) {
 	_, err := api.client(false).CreateRecord(context.Background(), DNSRecord{
 		Key:        "a-foo.example.com",
 		RecordType: "TXT",
-		Value:      `"heritage=external-dns,external-dns/owner=us"`,
+		Value:      `"heritage=dexd,dexd/owner=us"`,
 	})
 	if err != nil {
 		t.Fatalf("CreateRecord (TXT): %v", err)
@@ -375,7 +375,7 @@ func TestCreateTXT_OmitsTTL(t *testing.T) {
 	if _, present := req.Body["ttl"]; present {
 		t.Fatalf("TXT record body MUST NOT include ttl, got %v", req.Body)
 	}
-	if req.Body["value"] != `"heritage=external-dns,external-dns/owner=us"` {
+	if req.Body["value"] != `"heritage=dexd,dexd/owner=us"` {
 		t.Fatalf("TXT value = %q, want quoted ownership value", req.Body["value"])
 	}
 }

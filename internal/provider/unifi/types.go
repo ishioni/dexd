@@ -1,7 +1,7 @@
 package unifi
 
 // DNSRecord is the wire format for UniFi's static-dns endpoint.
-// Field names mirror what kashalls/external-dns-unifi-webhook sends.
+// Field names match the UniFi static-DNS API contract.
 type DNSRecord struct {
 	ID         string `json:"_id,omitempty"`
 	Key        string `json:"key"`

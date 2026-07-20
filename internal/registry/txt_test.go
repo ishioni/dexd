@@ -124,13 +124,13 @@ func TestEncodeTXT_IsQuoted(t *testing.T) {
 	if !strings.HasPrefix(got, `"`) || !strings.HasSuffix(got, `"`) {
 		t.Errorf("EncodeTXT must wrap value in double quotes for UniFi, got %q", got)
 	}
-	if !strings.Contains(got, "heritage=external-dns") {
+	if !strings.Contains(got, "heritage=dexd") {
 		t.Errorf("encoded value missing heritage marker: %q", got)
 	}
-	if !strings.Contains(got, "external-dns/owner=owner-1") {
+	if !strings.Contains(got, "dexd/owner=owner-1") {
 		t.Errorf("encoded value missing owner: %q", got)
 	}
-	if !strings.Contains(got, "external-dns/resource=docker/whoami") {
+	if !strings.Contains(got, "dexd/resource=docker/whoami") {
 		t.Errorf("encoded value missing resource: %q", got)
 	}
 }
@@ -153,7 +153,7 @@ func TestDecodeTXT_RoundTrip(t *testing.T) {
 
 func TestDecodeTXT_StripsQuotes(t *testing.T) {
 	// Even if the value comes back without quotes, it must still parse.
-	unquoted := "heritage=external-dns,external-dns/owner=us,external-dns/resource=docker/x"
+	unquoted := "heritage=dexd,dexd/owner=us,dexd/resource=docker/x"
 	if _, ok := DecodeTXT(unquoted); !ok {
 		t.Errorf("DecodeTXT failed on unquoted value")
 	}
@@ -168,12 +168,13 @@ func TestDecodeTXT_StripsQuotes(t *testing.T) {
 	}
 }
 
-func TestDecodeTXT_RejectsNonHeritage(t *testing.T) {
+func TestDecodeTXT_RejectsInvalidHeritage(t *testing.T) {
 	cases := []string{
 		"",
 		"random text",
 		"v=spf1 include:_spf.google.com ~all",
 		`"some other quoted thing"`,
+		"heritage=another-agent,dexd/owner=us",
 	}
 	for _, c := range cases {
 		if _, ok := DecodeTXT(c); ok {
@@ -184,7 +185,7 @@ func TestDecodeTXT_RejectsNonHeritage(t *testing.T) {
 
 func TestDecodeTXT_RequiresOwner(t *testing.T) {
 	// Heritage present but no owner field — should reject.
-	if _, ok := DecodeTXT("heritage=external-dns,external-dns/resource=foo"); ok {
+	if _, ok := DecodeTXT("heritage=dexd,dexd/resource=foo"); ok {
 		t.Error("DecodeTXT must reject values without an owner field")
 	}
 }

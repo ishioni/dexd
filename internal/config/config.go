@@ -31,7 +31,7 @@ type Config struct {
 
 	// DNS
 	DefaultTarget     string        `env:"DEFAULT_TARGET,required"`
-	OwnerID           string        `env:"TXT_OWNER" envDefault:"docker-external-dns"`
+	OwnerID           string        `env:"TXT_OWNER" envDefault:"dexd"`
 	TxtPrefix         string        `env:"TXT_PREFIX" envDefault:""`
 	Policy            Policy        `env:"POLICY" envDefault:"sync"`
 	DefaultTTL        DefaultTTL    `env:"DEFAULT_TTL" envDefault:"auto"`
