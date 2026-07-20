@@ -41,6 +41,28 @@ type recordKey struct {
 // returns what needs to change. It only touches records whose companion
 // TXT ownership record matches ownerID — all others are left untouched.
 // txtPrefix must match the value used when writing TXT keys (see registry.TXTKey).
+// DesiredRecordCounts returns the number of unique desired A and CNAME records
+// by type. Multiple containers claiming the same hostname/type count once, which
+// mirrors the collision handling in Compute.
+func DesiredRecordCounts(desired []*source.Endpoint) map[string]int {
+	counts := map[string]int{"A": 0, "CNAME": 0}
+	seen := make(map[recordKey]bool, len(desired))
+
+	for _, ep := range desired {
+		if ep.RecordType != "A" && ep.RecordType != "CNAME" {
+			continue
+		}
+		key := recordKey{Hostname: ep.DNSName, RecordType: ep.RecordType}
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		counts[ep.RecordType]++
+	}
+
+	return counts
+}
+
 func Compute(desired []*source.Endpoint, current []unifi.DNSRecord, ownerID, txtPrefix string) Changes {
 	// Build lookup maps from current records.
 	aOrCnameByKey := make(map[recordKey]unifi.DNSRecord)

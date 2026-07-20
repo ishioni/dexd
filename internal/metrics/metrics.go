@@ -57,20 +57,13 @@ var (
 		[]string{"operation", "record_type", "result"},
 	)
 
-	planDesiredRecords = prometheus.NewGauge(
+	planDesiredRecords = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Namespace: namespace,
 			Name:      "plan_desired_records",
-			Help:      "Number of desired DNS endpoints from the latest reconcile.",
+			Help:      "Number of unique desired DNS records from the latest reconcile by record type, including companion TXT ownership records.",
 		},
-	)
-
-	planCurrentRecords = prometheus.NewGauge(
-		prometheus.GaugeOpts{
-			Namespace: namespace,
-			Name:      "plan_current_records",
-			Help:      "Number of provider DNS records from the latest reconcile.",
-		},
+		[]string{"record_type"},
 	)
 
 	planChanges = prometheus.NewGaugeVec(
@@ -86,7 +79,7 @@ var (
 		prometheus.GaugeOpts{
 			Namespace: namespace,
 			Name:      "source_endpoints",
-			Help:      "Number of desired endpoints discovered from the source during the latest reconcile.",
+			Help:      "Number of unique desired A/CNAME records discovered from the source during the latest reconcile.",
 		},
 	)
 
@@ -154,7 +147,6 @@ func init() {
 		reconcileErrorsTotal,
 		changesTotal,
 		planDesiredRecords,
-		planCurrentRecords,
 		planChanges,
 		sourceEndpoints,
 		sourceErrorsTotal,
@@ -188,10 +180,16 @@ func IncReconcileError(stage string) {
 	reconcileErrorsTotal.WithLabelValues(stage).Inc()
 }
 
-func SetPlanMetrics(desired, current int, changes map[string]int) {
-	planDesiredRecords.Set(float64(desired))
-	planCurrentRecords.Set(float64(current))
-	sourceEndpoints.Set(float64(desired))
+func SetPlanMetrics(desiredByType map[string]int, changes map[string]int) {
+	desiredTotal := 0
+	for _, recordType := range []string{"A", "CNAME"} {
+		count := desiredByType[recordType]
+		planDesiredRecords.WithLabelValues(recordType).Set(float64(count))
+		desiredTotal += count
+	}
+	// Every managed A/CNAME record has a companion TXT ownership record.
+	planDesiredRecords.WithLabelValues("TXT").Set(float64(desiredTotal))
+	sourceEndpoints.Set(float64(desiredTotal))
 
 	for _, operation := range []string{"create", "update", "replace", "delete", "orphan_txt_delete"} {
 		planChanges.WithLabelValues(operation).Set(float64(changes[operation]))
