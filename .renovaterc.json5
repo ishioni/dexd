@@ -1,5 +1,9 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: ["local>home-operations/renovate-config"],
+  // Override the shared Helm task preset: this repository has no Helm charts.
+  postUpgradeTasks: {
+    commands: [],
+  },
   postUpdateOptions: ["gomodTidy", "gomodUpdateImportPaths"],
 }
