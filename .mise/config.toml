@@ -1,0 +1,64 @@
+# mise is the project toolchain source of truth. Run `mise tasks` to discover
+# the same build, test, lint, and image commands used by CI.
+
+[tools]
+go = "1.26.5"
+golangci-lint = "2.12.2"
+lefthook = "2.1.10"
+oxfmt = "0.59.0"
+zizmor = "1.27.0"
+
+[tasks.build]
+description = "Compile the dexd binary"
+run = "go build ./..."
+
+[tasks.vet]
+description = "Run go vet"
+run = "go vet ./..."
+
+[tasks.test]
+description = "Run unit and integration tests with the race detector"
+run = "go test -race -timeout 30s ./... -coverprofile=cover.out"
+
+[tasks.fmt]
+description = "Format Go sources"
+run = "gofmt -w cmd internal"
+
+[tasks.fmt-check]
+description = "Verify Go formatting"
+run = "test -z \"$(gofmt -l cmd internal)\""
+
+[tasks.oxfmt]
+description = "Format YAML, JSON, Markdown, and other non-Go project files"
+run = "oxfmt --write ."
+
+[tasks.oxfmt-check]
+description = "Verify non-Go project formatting"
+run = "oxfmt --check ."
+
+[tasks.lint]
+description = "Run golangci-lint"
+run = "golangci-lint run"
+
+[tasks.zizmor]
+description = "Audit GitHub Actions workflows for security issues"
+run = "zizmor .github"
+
+[tasks.tidy-check]
+description = "Verify go.mod and go.sum are tidy"
+run = "go mod tidy && git diff --exit-code go.mod go.sum"
+
+[tasks.dev]
+description = "Run dexd locally (reads .env when present)"
+run = "go run ./cmd/dexd"
+
+[tasks.docker-build]
+description = "Build the container image"
+run = "docker build --tag dexd ."
+
+[tasks.docker-run]
+description = "Build and run dexd with Docker Compose"
+run = "docker compose up --build"
+
+[hooks]
+postinstall = "lefthook install"

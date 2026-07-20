@@ -1,0 +1,14 @@
+.git
+.github
+.mise
+.claude
+.env
+.env.*
+!.env.example
+bin
+cover.out
+coverage.txt
+README.md
+LICENSE
+AGENTS.md
+CHANGELOG.md

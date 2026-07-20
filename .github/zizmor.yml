@@ -1,0 +1,3 @@
+# Zizmor audits GitHub Actions workflows. Add narrowly-scoped rule exceptions here
+# only when a workflow's behavior makes the finding inapplicable.
+rules: {}

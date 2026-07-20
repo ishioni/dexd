@@ -1,0 +1,74 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Release
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - "**.md"
+      - ".release-please-manifest.json"
+  release:
+    types: [published]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'release' }}
+
+permissions:
+  contents: read
+
+jobs:
+  versions:
+    name: Resolve versions
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    outputs:
+      go-version: ${{ steps.versions.outputs.go-version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Setup Mise
+        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
+        with:
+          cache: false
+          experimental: true
+          install: false
+      - name: Read configured Go version
+        id: versions
+        run: echo "go-version=$(mise config get tools.go)" >> "$GITHUB_OUTPUT"
+
+  image:
+    name: Publish image
+    needs: versions
+    permissions:
+      contents: read
+      id-token: write
+      packages: write
+    uses: docker/github-builder/.github/workflows/build.yml@3415a188caae9a0da7fba83bc06985776e0b1790 # v1.14.0
+    with:
+      build-args: |
+        VERSION=${{ github.ref_name }}
+        REVISION=${{ github.sha }}
+        GO_VERSION=${{ needs.versions.outputs.go-version }}
+      cache: true
+      meta-images: ghcr.io/${{ github.repository }}
+      meta-tags: |
+        type=semver,pattern={{version}}
+        type=raw,value=latest,enable=${{ github.event_name == 'release' }}
+        type=ref,event=branch
+      output: image
+      platforms: linux/amd64,linux/arm64
+      push: true
+      sbom: true
+      set-meta-annotations: true
+      set-meta-labels: true
+      sign: true
+    secrets:
+      registry-auths: |
+        - registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}

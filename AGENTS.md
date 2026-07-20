@@ -24,35 +24,46 @@ Docker daemon → label parser → plan → UniFi static-DNS
 
 ### Files written
 
-| File | Purpose |
-|---|---|
-| `cmd/dexd/main.go` | Entry point, signal handling, wiring |
-| `internal/config/config.go` | Env-driven config with validation |
-| `internal/config/config_test.go` | Config validation tests, including policy, default TTL, and reconcile interval |
-| `internal/source/endpoint.go` | Shared `Endpoint` type |
-| `internal/source/traefik.go` | Extracts hostnames from Traefik labels |
-| `internal/source/docker.go` | Lists containers, streams Docker events |
-| `internal/provider/unifi/types.go` | `DNSRecord` DTO matching UniFi wire format |
-| `internal/provider/unifi/client.go` | HTTP client for UniFi static-dns CRUD |
-| `internal/provider/unifi/errors.go` | Typed UniFi API/network/data errors |
-| `internal/provider/unifi/client_test.go` | Strict UniFi API simulator tests via `httptest.NewServer` |
-| `internal/registry/txt.go` | external-dns-compatible TXT ownership encode/decode |
-| `internal/plan/plan.go` | Diffs desired vs current, produces Changes |
-| `internal/controller/controller.go` | Reconcile loop with event debounce + periodic ticker |
-| `internal/controller/types.go` | `Source` and `Provider` interfaces + domain `Event` type |
-| `internal/controller/controller_test.go` | Reconcile tests with in-process fakes, policy coverage, and debounce test |
+| File                                            | Purpose                                                                             |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `cmd/dexd/main.go`                              | Entry point, signal handling, wiring                                                |
+| `internal/config/config.go`                     | Env-driven config with validation                                                   |
+| `internal/config/config_test.go`                | Config validation tests, including policy, default TTL, and reconcile interval      |
+| `internal/source/endpoint.go`                   | Shared `Endpoint` type                                                              |
+| `internal/source/traefik.go`                    | Extracts hostnames from Traefik labels                                              |
+| `internal/source/docker.go`                     | Lists containers, streams Docker events                                             |
+| `internal/provider/unifi/types.go`              | `DNSRecord` DTO matching UniFi wire format                                          |
+| `internal/provider/unifi/client.go`             | HTTP client for UniFi static-dns CRUD                                               |
+| `internal/provider/unifi/errors.go`             | Typed UniFi API/network/data errors                                                 |
+| `internal/provider/unifi/client_test.go`        | Strict UniFi API simulator tests via `httptest.NewServer`                           |
+| `internal/registry/txt.go`                      | external-dns-compatible TXT ownership encode/decode                                 |
+| `internal/plan/plan.go`                         | Diffs desired vs current, produces Changes                                          |
+| `internal/controller/controller.go`             | Reconcile loop with event debounce + periodic ticker                                |
+| `internal/controller/types.go`                  | `Source` and `Provider` interfaces + domain `Event` type                            |
+| `internal/controller/controller_test.go`        | Reconcile tests with in-process fakes, policy coverage, and debounce test           |
 | `internal/controller/unifi_integration_test.go` | End-to-end fake source → real controller → real UniFi client → fake UniFi API tests |
-| `internal/metrics/metrics.go` | Prometheus collectors and `/metrics` handler |
-| `internal/metrics/metrics_test.go` | Metrics handler smoke test |
-| `Dockerfile` | Multi-stage build → scratch final image |
-| `docker-compose.yml` | Example deployment |
-| `.env.example` | Deployment env template; keep in sync with config and README |
-| `deploy/prometheusrule.yaml` | Example Prometheus Operator alert rules |
-| `Makefile` | `make build / run / test / vet / docker-build / docker-run` |
-| `internal/source/traefik_test.go` | Table tests for label → endpoint extraction |
-| `internal/source/docker_test.go` | Endpoints aggregation, name parsing, event filters |
-| `internal/registry/txt_test.go` | TXT encode/decode round-trip + ownership tests |
-| `internal/plan/plan_test.go` | Diff engine: create/update/delete/replace + safety guards |
+| `internal/metrics/metrics.go`                   | Prometheus collectors and `/metrics` handler                                        |
+| `internal/metrics/metrics_test.go`              | Metrics handler smoke test                                                          |
+| `Dockerfile`                                    | Multi-stage build → scratch final image                                             |
+| `docker-compose.yml`                            | Example deployment                                                                  |
+| `.env.example`                                  | Deployment env template; keep in sync with config and README                        |
+| `deploy/prometheusrule.yaml`                    | Example Prometheus Operator alert rules                                             |
+| `Makefile`                                      | `make build / run / test / vet / docker-build / docker-run`                         |
+| `internal/source/traefik_test.go`               | Table tests for label → endpoint extraction                                         |
+| `internal/source/docker_test.go`                | Endpoints aggregation, name parsing, event filters                                  |
+| `internal/registry/txt_test.go`                 | TXT encode/decode round-trip + ownership tests                                      |
+| `internal/plan/plan_test.go`                    | Diff engine: create/update/delete/replace + safety guards                           |
+| `.mise/config.toml`                             | Pinned Go tooling and local/CI task definitions                                     |
+| `.lefthook.toml`                                | Shared Home Operations hooks plus pre-push race-tested suite                        |
+| `.github/workflows/*.yaml`                      | Pinned lint, test, release, release-please, Renovate, and stale automation          |
+
+### Tooling and automation
+
+- `mise` is the source of truth for the Go version and build, test, formatting, lint, module-tidiness, and GitHub Actions security-audit tasks. Run `mise tasks` to discover them and `mise run <task>` locally.
+- Lefthook imports the shared `home-operations/.github` hook policy and runs `mise run test` before pushes.
+- Release Please tracks releases from the existing `v0.3.1` tag (`81aaacf`), writes `CHANGELOG.md`, and uses unprefixed semantic tags such as `0.4.0`.
+- Renovate imports `local>home-operations/renovate-config` and uses the repository GitHub App credentials (`BOT_CLIENT_ID` and `BOT_APP_PRIVATE_KEY`). The same App credentials are required by Release Please.
+- GitHub Actions use pinned action SHAs, run on `master` (the repository's current default branch), audit workflows with Zizmor, publish signed multi-architecture GHCR images, and execute the stale-item policy.
 
 ## Key design decisions
 
@@ -71,15 +82,15 @@ Container-level defaults apply to all routers from the container:
 
 ```yaml
 dexd.enabled: "true"
-dexd.target: "<ip-or-hostname>"  # IPv4 → A, hostname → CNAME
+dexd.target: "<ip-or-hostname>" # IPv4 → A, hostname → CNAME
 ```
 
 Per-router overrides are matched by router name from `traefik.http.routers.<name>.rule`:
 
 ```yaml
 dexd.routers.<name>.target: "<ip-or-hostname>"
-dexd.routers.<name>.hostnames: "<hostname>[,<hostname>...]"        # replaces parsed Host() names
-dexd.routers.<name>.extra-hostnames: "<hostname>[,<hostname>...]"  # appends to parsed Host() names
+dexd.routers.<name>.hostnames: "<hostname>[,<hostname>...]" # replaces parsed Host() names
+dexd.routers.<name>.extra-hostnames: "<hostname>[,<hostname>...]" # appends to parsed Host() names
 dexd.routers.<name>.skip: "true"
 ```
 
@@ -104,6 +115,7 @@ UniFi endpoint: `POST /proxy/network/v2/api/site/{site}/static-dns`
 ```
 
 TXT ownership value:
+
 ```
 heritage=external-dns,external-dns/owner=docker-external-dns,external-dns/resource=docker/myapp
 ```
@@ -114,15 +126,15 @@ Source for UniFi wire format: https://github.com/kashalls/external-dns-unifi-web
 
 Run with `make test` or `go test -race ./...`. All tests use stdlib only (no testcontainers, no Docker daemon or real UniFi controller needed).
 
-| Package | What it covers |
-|---|---|
-| `internal/source` | Label → endpoint extraction: enable-flag gating, `dexd.*` label vocabulary with legacy `external-dns.*` aliases, standalone host blocks, single/multi `Host()`, `\|\|` joining, router hostname override/append labels, `HostRegexp` skip, unsubstituted `${VAR}` skip, multi-router merging, container/router target and record-type overrides, router skip. |
-| `internal/registry` | `TXTKey` and `ParseTXTKey` formatting/parsing, `EncodeTXT` always quoted, `DecodeTXT` round-trip + quote stripping, rejects non-heritage values, `IsOwnedBy` cross-owner matrix. |
-| `internal/plan` | All Create/Update/Delete/Replace branches for A and CNAME plus the three safety rules: no update without our TXT, no update if TXT belongs to another owner, no delete without our TXT. |
-| `internal/provider/unifi` | HTTP wire format: list shape, `_id`, `X-Api-Key`, `Accept`, `Content-Type`, A/CNAME omit `ttl` for auto or include configured numeric TTL, **TXT omits `ttl`**, PUT/DELETE URLs, typed API/network/data errors, dry-run makes no mutation calls. |
-| `internal/controller` | Reconcile → apply flow: create/update/delete record+TXT pairs, CNAME pair creation, all three ownership safety rules, error-continues behaviour, debounce → reconcile event path, and integration tests through the real UniFi client against a strict fake UniFi API. |
-| `internal/metrics` | Prometheus handler and metrics for reconcile health, plan/change counts, source events, provider requests, provider errors, and build/config info. |
-| `internal/source` (docker) | Endpoints aggregation across multiple containers, name slash-stripping, ID fallback, list error propagation, event filter correctness, channel pass-through. |
+| Package                    | What it covers                                                                                                                                                                                                                                                                                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `internal/source`          | Label → endpoint extraction: enable-flag gating, `dexd.*` label vocabulary with legacy `external-dns.*` aliases, standalone host blocks, single/multi `Host()`, `\|\|` joining, router hostname override/append labels, `HostRegexp` skip, unsubstituted `${VAR}` skip, multi-router merging, container/router target and record-type overrides, router skip. |
+| `internal/registry`        | `TXTKey` and `ParseTXTKey` formatting/parsing, `EncodeTXT` always quoted, `DecodeTXT` round-trip + quote stripping, rejects non-heritage values, `IsOwnedBy` cross-owner matrix.                                                                                                                                                                              |
+| `internal/plan`            | All Create/Update/Delete/Replace branches for A and CNAME plus the three safety rules: no update without our TXT, no update if TXT belongs to another owner, no delete without our TXT.                                                                                                                                                                       |
+| `internal/provider/unifi`  | HTTP wire format: list shape, `_id`, `X-Api-Key`, `Accept`, `Content-Type`, A/CNAME omit `ttl` for auto or include configured numeric TTL, **TXT omits `ttl`**, PUT/DELETE URLs, typed API/network/data errors, dry-run makes no mutation calls.                                                                                                              |
+| `internal/controller`      | Reconcile → apply flow: create/update/delete record+TXT pairs, CNAME pair creation, all three ownership safety rules, error-continues behaviour, debounce → reconcile event path, and integration tests through the real UniFi client against a strict fake UniFi API.                                                                                        |
+| `internal/metrics`         | Prometheus handler and metrics for reconcile health, plan/change counts, source events, provider requests, provider errors, and build/config info.                                                                                                                                                                                                            |
+| `internal/source` (docker) | Endpoints aggregation across multiple containers, name slash-stripping, ID fallback, list error propagation, event filter correctness, channel pass-through.                                                                                                                                                                                                  |
 
 ## Known gaps / future work
 

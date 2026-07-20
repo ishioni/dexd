@@ -1,5 +1,8 @@
-FROM golang:1.26-alpine AS builder
-ARG PKG=github.com/ishioni/dexd
+# syntax=docker/dockerfile:1
+
+ARG GO_VERSION=1.26.5
+
+FROM golang:${GO_VERSION}-alpine AS builder
 ARG VERSION=dev
 ARG REVISION=dev
 
