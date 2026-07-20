@@ -123,7 +123,7 @@ func (c *Controller) reconcile(ctx context.Context) {
 	changes := plan.Compute(desired, current, c.ownerID, c.txtPrefix)
 	planned := changes
 	changes = applyPolicy(changes, c.policy)
-	appmetrics.SetPlanMetrics(len(desired), len(current), map[string]int{
+	appmetrics.SetPlanMetrics(plan.DesiredRecordCounts(desired), map[string]int{
 		"create":            len(changes.Create),
 		"update":            len(changes.Update),
 		"replace":           len(changes.Replace),

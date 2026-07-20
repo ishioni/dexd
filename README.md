@@ -91,21 +91,27 @@ increase(dexd_changes_total{result="error"}[10m]) > 0
 increase(dexd_provider_errors_total[10m]) > 0
 ```
 
-An example Prometheus Operator rule file is available at `deploy/prometheusrule.yaml`.
+`deploy/prometheusrule.yaml` includes alerts for stale successful reconciles, source/reconcile/change/provider errors, and slow reconciles. Apply it in clusters using the Prometheus Operator.
+
+Import [`deploy/grafana-dashboard.json`](deploy/grafana-dashboard.json) into Grafana to monitor reconciliation health, managed DNS records, plans and applied DNS changes, Docker events, UniFi provider requests/latency, errors, build information, and the Go process runtime. The dashboard includes datasource, `job`, and `instance` variables so it works with any Prometheus scrape configuration. **Managed UniFi Records** counts the desired A/CNAME records and their companion TXT ownership records, broken down by `record_type`; it does not expose the complete UniFi static-DNS inventory.
 
 Useful dashboard metrics:
 
 - `dexd_reconcile_total`
 - `dexd_reconcile_duration_seconds`
 - `dexd_reconcile_last_success_timestamp_seconds`
-- `dexd_plan_desired_records`
-- `dexd_plan_current_records`
+- `dexd_plan_desired_records{record_type}`
 - `dexd_plan_changes`
 - `dexd_changes_total`
 - `dexd_provider_requests_total`
 - `dexd_provider_request_duration_seconds`
 - `dexd_provider_errors_total`
 - `dexd_docker_events_total`
+- `process_cpu_seconds_total`
+- `process_resident_memory_bytes`
+- `go_memstats_heap_alloc_bytes`
+- `go_goroutines`
+- `go_threads`
 
 ## Container labels
 

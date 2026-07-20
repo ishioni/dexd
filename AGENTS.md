@@ -47,7 +47,8 @@ Docker daemon → label parser → plan → UniFi static-DNS
 | `Dockerfile`                                    | Multi-stage build → scratch final image                                             |
 | `docker-compose.yml`                            | Example deployment                                                                  |
 | `.env.example`                                  | Deployment env template; keep in sync with config and README                        |
-| `deploy/prometheusrule.yaml`                    | Example Prometheus Operator alert rules                                             |
+| `deploy/prometheusrule.yaml`                    | Prometheus Operator alerts for reconciliation and provider health                   |
+| `deploy/grafana-dashboard.json`                 | Importable Grafana dashboard for dexd operational metrics                           |
 | `Makefile`                                      | `make build / run / test / vet / docker-build / docker-run`                         |
 | `internal/source/traefik_test.go`               | Table tests for label → endpoint extraction                                         |
 | `internal/source/docker_test.go`                | Endpoints aggregation, name parsing, event filters                                  |
@@ -142,7 +143,7 @@ Run with `make test` or `go test -race ./...`. All tests use stdlib only (no tes
 - [x] **Standalone non-Traefik hosts**: add explicit labels such as
       `dexd.hosts.<name>.*` for endpoints that do not have Traefik
       router rules.
-- [x] **Prometheus metrics**: `/metrics` exports reconcile totals/duration/last success, reconcile errors, plan gauges, change counters, source errors/events, provider request metrics, provider errors, and build info.
+- [x] **Prometheus metrics**: `/metrics` exports reconcile totals/duration/last success, reconcile errors, plan gauges, change counters, source errors/events, provider request metrics, provider errors, build info, and the standard Go/process runtime collectors. `dexd_plan_desired_records{record_type}` is the unique desired A/CNAME record count by type plus their companion TXT ownership records; the exporter intentionally does not expose the complete UniFi static-DNS inventory.
 
 ## Dependency notes
 

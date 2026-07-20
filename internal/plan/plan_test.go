@@ -238,6 +238,19 @@ func TestCompute(t *testing.T) {
 	}
 }
 
+func TestDesiredRecordCounts(t *testing.T) {
+	desired := []*source.Endpoint{
+		endpoint("a.example.com", "10.0.0.1"),
+		endpoint("a.example.com", "10.0.0.2"), // collision; count once
+		endpointType("c.example.com", "target.example.com", "CNAME"),
+	}
+
+	got := DesiredRecordCounts(desired)
+	if got["A"] != 1 || got["CNAME"] != 1 {
+		t.Errorf("DesiredRecordCounts = %v, want A=1 CNAME=1", got)
+	}
+}
+
 func TestCompute_WithTXTPrefix(t *testing.T) {
 	const prefix = "userprefix."
 	desired := []*source.Endpoint{endpoint("foo.example.com", "10.0.0.2")}

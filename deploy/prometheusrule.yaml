@@ -26,6 +26,15 @@ spec:
             summary: dexd reconcile errors
             description: dexd reported one or more failed reconciles in the last 10 minutes.
 
+        - alert: DexdSourceErrors
+          expr: increase(dexd_source_errors_total[10m]) > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: dexd source discovery errors
+            description: dexd failed to list Docker containers or process source events in the last 10 minutes.
+
         - alert: DexdChangeErrors
           expr: increase(dexd_changes_total{result="error"}[10m]) > 0
           for: 5m
