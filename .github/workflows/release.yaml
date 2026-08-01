@@ -32,7 +32,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup Mise
-        uses: jdx/mise-action@dad1bfd3df957f44999b559dd69dc1671cb4e9ea # v4.2.1
+        uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
         with:
           cache: false
           experimental: true
@@ -48,7 +48,7 @@ jobs:
       contents: read
       id-token: write
       packages: write
-    uses: docker/github-builder/.github/workflows/build.yml@3415a188caae9a0da7fba83bc06985776e0b1790 # v1.14.0
+    uses: docker/github-builder/.github/workflows/build.yml@27ade872c1e2296e62ef15ab3b10d37665e57cf7 # v1.15.0
     with:
       build-args: |
         VERSION=${{ github.ref_name }}
