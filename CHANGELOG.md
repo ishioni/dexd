@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1](https://github.com/ishioni/dexd/compare/0.4.0...0.4.1) (2026-08-03)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/prometheus/client_golang (v1.24.0 → v1.24.1) ([#24](https://github.com/ishioni/dexd/issues/24)) ([566c830](https://github.com/ishioni/dexd/commit/566c830b2bd6600ef075db16faf94b9258bd13ca))
+* **renovate:** disable inherited Helm post-upgrade tasks ([6ec922f](https://github.com/ishioni/dexd/commit/6ec922fb7dbb4421834a19bf81b2c84ac5139af6))
+
 ## [0.4.0](https://github.com/ishioni/dexd/compare/v0.3.1...0.4.0) (2026-07-20)
 
 
