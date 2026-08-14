@@ -1,6 +1,15 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: ["local>home-operations/renovate-config"],
+  packageRules: [
+    {
+      description: "Keep the Go module and mise toolchain versions aligned",
+      matchManagers: ["gomod", "mise"],
+      matchDepNames: ["go"],
+      groupName: "Go toolchain",
+      groupSlug: "go-toolchain",
+    },
+  ],
   // Override the shared Helm task preset: this repository has no Helm charts.
   postUpgradeTasks: {
     commands: [],
