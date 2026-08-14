@@ -54,11 +54,11 @@ run = "go run ./cmd/dexd"
 
 [tasks.docker-build]
 description = "Build the container image"
-run = "docker build --tag dexd ."
+run = "docker build --build-arg GO_VERSION=$(mise config get tools.go) --tag dexd ."
 
 [tasks.docker-run]
 description = "Build and run dexd with Docker Compose"
-run = "docker compose up --build"
+run = "GO_VERSION=$(mise config get tools.go) docker compose up --build"
 
 [hooks]
 postinstall = "lefthook install"

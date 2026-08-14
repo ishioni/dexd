@@ -3,7 +3,10 @@
 # Deploy this alongside Traefik on your Docker host.
 services:
   dexd:
-    build: .
+    build:
+      context: .
+      args:
+        GO_VERSION: ${GO_VERSION:?GO_VERSION must be set}
     container_name: dexd
     restart: unless-stopped
     environment:

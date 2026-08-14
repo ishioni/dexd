@@ -1,5 +1,6 @@
-BINARY := dexd
-CMD     := ./cmd/dexd
+BINARY     := dexd
+CMD        := ./cmd/dexd
+GO_VERSION ?= $(shell mise config get tools.go)
 
 # Load .env if it exists — lets you set UNIFI_HOST, UNIFI_API_KEY, etc. once
 # and use all targets without re-typing credentials.
@@ -20,7 +21,7 @@ run:
 
 ## docker-run: build image and run via docker compose (production)
 docker-run:
-	docker compose up --build
+	GO_VERSION=$(GO_VERSION) docker compose up --build
 
 ## vet: run go vet
 vet:
@@ -32,7 +33,7 @@ test:
 
 ## docker-build: build the Docker image
 docker-build:
-	docker build -t $(BINARY) .
+	docker build --build-arg GO_VERSION=$(GO_VERSION) -t $(BINARY) .
 
 ## clean: remove the compiled binary
 clean:

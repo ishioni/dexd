@@ -208,8 +208,10 @@ support.
 go build ./cmd/dexd
 ```
 
-or with Docker:
+or with Docker, using the Go version pinned by mise:
 
 ```bash
-docker build -t dexd .
+mise run docker-build
 ```
+
+The equivalent Make target is `make docker-build`.
