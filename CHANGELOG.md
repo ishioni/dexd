@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.2](https://github.com/ishioni/dexd/compare/0.4.1...0.4.2) (2026-08-14)
+
+
+### Bug Fixes
+
+* **docker:** source Go version from mise ([2be20d5](https://github.com/ishioni/dexd/commit/2be20d571d3787e5d857deb6d2689cebae7986e8))
+* **go:** update module go (1.26.5 → 1.26.6) ([#34](https://github.com/ishioni/dexd/issues/34)) ([1dbcece](https://github.com/ishioni/dexd/commit/1dbcece132d9d5f5855f9b417136b97b5fd70b4e))
+* **renovate:** group Go toolchain updates ([f58eaa0](https://github.com/ishioni/dexd/commit/f58eaa0b5cf3ecabba71d8da0f5aa05c24943ae1))
+
 ## [0.4.1](https://github.com/ishioni/dexd/compare/0.4.0...0.4.1) (2026-08-03)
 
 
