@@ -200,7 +200,7 @@ func hostnamesFromRule(rule string) []string {
 
 func parseHostnameList(value string) []string {
 	var hostnames []string
-	for _, raw := range strings.Split(value, ",") {
+	for raw := range strings.SplitSeq(value, ",") {
 		hostname := strings.TrimSpace(raw)
 		if hostname != "" {
 			hostnames = append(hostnames, hostname)
