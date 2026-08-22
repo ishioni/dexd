@@ -2,7 +2,7 @@
 # the same build, test, lint, and image commands used by CI.
 
 [tools]
-go = "1.26.6"
+go = "1.27.0"
 golangci-lint = "2.13.1"
 lefthook = "2.1.11"
 oxfmt = "0.64.0"
