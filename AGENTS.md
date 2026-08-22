@@ -60,7 +60,7 @@ Docker daemon → label parser → plan → UniFi static-DNS
 
 ### Tooling and automation
 
-- `mise` is the source of truth for the Go version and build, test, formatting, lint, module-tidiness, and GitHub Actions security-audit tasks. Run `mise tasks` to discover them and `mise run <task>` locally. Docker builds receive the pinned Go version as the required `GO_VERSION` build argument through the mise tasks, Makefile targets, release workflow, and Compose configuration.
+- `mise` is the source of truth for the Go version and build, test, formatting, lint, module-tidiness, and GitHub Actions security-audit tasks. Run `mise tasks` to discover them and `mise run <task>` locally. Node.js is pinned as the runtime required by oxfmt. Docker builds receive the pinned Go version as the required `GO_VERSION` build argument through the mise tasks, Makefile targets, release workflow, and Compose configuration.
 - Lefthook imports the shared `home-operations/.github` hook policy and runs `mise run test` before pushes.
 - Release Please tracks releases from the existing `v0.3.1` tag (`81aaacf`), writes `CHANGELOG.md`, and uses unprefixed semantic tags such as `0.4.0`.
 - Renovate imports `local>home-operations/renovate-config`, groups the `go.mod` directive and mise Go tool into one `Go toolchain` update, and uses the repository GitHub App credentials (`BOT_CLIENT_ID` and `BOT_APP_PRIVATE_KEY`). The same App credentials are required by Release Please.
