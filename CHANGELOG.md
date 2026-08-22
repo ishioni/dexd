@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/ishioni/dexd/compare/0.4.2...0.4.3) (2026-08-22)
+
+
+### Bug Fixes
+
+* **go:** align module and mise toolchain versions ([#43](https://github.com/ishioni/dexd/issues/43)) ([1b1d2e8](https://github.com/ishioni/dexd/commit/1b1d2e8c392f94efabc32b1da72894e23ddbc896))
+
 ## [0.4.2](https://github.com/ishioni/dexd/compare/0.4.1...0.4.2) (2026-08-14)
 
 
