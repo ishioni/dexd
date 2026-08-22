@@ -3,6 +3,7 @@ package source
 import (
 	"context"
 	"errors"
+	"maps"
 	"sort"
 	"testing"
 
@@ -45,9 +46,7 @@ func inScopeContainer(id, name string, extraLabels map[string]string) container.
 		"traefik.enable": "true",
 		"dexd.enabled":   "true",
 	}
-	for k, v := range extraLabels {
-		labels[k] = v
-	}
+	maps.Copy(labels, extraLabels)
 	return container.Summary{
 		ID:     id,
 		Names:  []string{"/" + name},

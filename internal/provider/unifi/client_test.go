@@ -273,8 +273,7 @@ func TestListRecords_InvalidJSONReturnsDataError(t *testing.T) {
 	api.respondRaw(http.StatusOK, `{"invalid": json}`)
 
 	_, err := api.client(false).ListRecords(context.Background())
-	var dataErr *DataError
-	if !errors.As(err, &dataErr) {
+	if _, ok := errors.AsType[*DataError](err); !ok {
 		t.Fatalf("ListRecords error = %T %v, want *DataError", err, err)
 	}
 }
@@ -388,8 +387,7 @@ func TestValidateRecordRejectsWildcardCNAME(t *testing.T) {
 		RecordType: "CNAME",
 		Value:      "target.example.com",
 	})
-	var unsupported *UnsupportedRecordError
-	if !errors.As(err, &unsupported) {
+	if _, ok := errors.AsType[*UnsupportedRecordError](err); !ok {
 		t.Fatalf("ValidateRecord error = %T %v, want *UnsupportedRecordError", err, err)
 	}
 }
@@ -475,8 +473,7 @@ func TestNetworkError(t *testing.T) {
 	client.http.Transport = failingTransport{}
 
 	_, err := client.ListRecords(context.Background())
-	var networkErr *NetworkError
-	if !errors.As(err, &networkErr) {
+	if _, ok := errors.AsType[*NetworkError](err); !ok {
 		t.Fatalf("ListRecords error = %T %v, want *NetworkError", err, err)
 	}
 }

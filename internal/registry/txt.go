@@ -93,7 +93,7 @@ func DecodeTXT(value string) (OwnershipRecord, bool) {
 
 	var rec OwnershipRecord
 	validHeritage := false
-	for _, part := range strings.Split(value, ",") {
+	for part := range strings.SplitSeq(value, ",") {
 		k, v, ok := strings.Cut(part, "=")
 		if !ok {
 			continue
