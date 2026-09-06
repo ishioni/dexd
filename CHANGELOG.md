@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.4](https://github.com/ishioni/dexd/compare/0.4.3...0.4.4) (2026-09-06)
+
+
+### Bug Fixes
+
+* **mise:** update tool go (1.27.0 → 1.27.1) ([#51](https://github.com/ishioni/dexd/issues/51)) ([569a364](https://github.com/ishioni/dexd/commit/569a364609931867630337681738eb37e4dab3f2))
+
+
+### Miscellaneous Chores
+
+* **ci:** update release-please config ([80a97ae](https://github.com/ishioni/dexd/commit/80a97ae89e8fedb8cf18de217169145e9168871a))
+* **github-action:** update github-actions ([#47](https://github.com/ishioni/dexd/issues/47)) ([0bb4295](https://github.com/ishioni/dexd/commit/0bb4295fa690c6d3afaa50a10751bea84d3e8def))
+* **mise:** update mise tools ([#50](https://github.com/ishioni/dexd/issues/50)) ([481db51](https://github.com/ishioni/dexd/commit/481db51cab2a6e9844f924ffec50e1dc4ea47486))
+* **mise:** update tool node (24.19.0 → v24.20.0) ([#49](https://github.com/ishioni/dexd/issues/49)) ([e3f6d7b](https://github.com/ishioni/dexd/commit/e3f6d7bc1067cbe15d433da6d3cb3bfd3ab79660))
+* **mise:** update tool oxfmt (0.64.0 → 0.65.0) ([#48](https://github.com/ishioni/dexd/issues/48)) ([eab22f1](https://github.com/ishioni/dexd/commit/eab22f16d17d111e7c44faa40fff6edd1f9153a4))
+* **mise:** update tool oxfmt (0.65.0 → 0.66.0) ([#52](https://github.com/ishioni/dexd/issues/52)) ([c075022](https://github.com/ishioni/dexd/commit/c075022fb99ac38464b27e3e613a223ef6c9572c))
+* run go fix with Go 1.27 ([#45](https://github.com/ishioni/dexd/issues/45)) ([be5e195](https://github.com/ishioni/dexd/commit/be5e19569e3edbc945dafa89c7f2741616ca92c4))
+
 ## [0.4.3](https://github.com/ishioni/dexd/compare/0.4.2...0.4.3) (2026-08-22)
 
 
