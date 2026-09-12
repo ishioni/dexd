@@ -7,7 +7,7 @@ golangci-lint = "2.13.2"
 lefthook = "2.1.12"
 node = "24.20.0"
 oxfmt = "0.67.0"
-zizmor = "1.30.0"
+zizmor = "1.30.1"
 
 [tasks.build]
 description = "Compile the dexd binary"
