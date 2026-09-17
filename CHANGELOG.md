@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.5](https://github.com/ishioni/dexd/compare/0.4.4...0.4.5) (2026-09-17)
+
+
+### Miscellaneous Chores
+
+* **github-action:** update action renovatebot/github-action (v46.2.5 → v46.2.6) ([#54](https://github.com/ishioni/dexd/issues/54)) ([0bd0f07](https://github.com/ishioni/dexd/commit/0bd0f0709df930e9124938b2f205045b18e9ba49))
+* **mise:** update tool lefthook (2.1.12 → 2.1.14) ([#59](https://github.com/ishioni/dexd/issues/59)) ([90d7659](https://github.com/ishioni/dexd/commit/90d76596d87ce94081a5a037a1b304e0a96a48a9))
+* **mise:** update tool node (24.20.0 → v24.21.0) ([#53](https://github.com/ishioni/dexd/issues/53)) ([e9dc4da](https://github.com/ishioni/dexd/commit/e9dc4dab9f3ab7f71094ed5e6f368ac9bcc20386))
+* **mise:** update tool oxfmt (0.66.0 → 0.67.0) ([#55](https://github.com/ishioni/dexd/issues/55)) ([769910c](https://github.com/ishioni/dexd/commit/769910c5f0bdb3276d22909121ab6bd97dba369d))
+* **mise:** update tool oxfmt (0.67.0 → 0.68.0) ([#60](https://github.com/ishioni/dexd/issues/60)) ([fdc3ca4](https://github.com/ishioni/dexd/commit/fdc3ca4798e4e09bc67f1cfacb34bc85a2044494))
+* **mise:** update tool zizmor (1.30.0 → 1.30.1) ([#57](https://github.com/ishioni/dexd/issues/57)) ([ebfa53f](https://github.com/ishioni/dexd/commit/ebfa53f54c1bf0d75ed898b16624faa197488e78))
+
 ## [0.4.4](https://github.com/ishioni/dexd/compare/0.4.3...0.4.4) (2026-09-06)
 
 
