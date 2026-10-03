@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.4.5](https://github.com/ishioni/dexd/compare/0.4.4...0.4.5) (2026-10-03)
+
+
+### Miscellaneous Chores
+
+* **github-action:** update action renovatebot/github-action (v46.2.5 → v46.2.6) ([#54](https://github.com/ishioni/dexd/issues/54)) ([0bd0f07](https://github.com/ishioni/dexd/commit/0bd0f0709df930e9124938b2f205045b18e9ba49))
+* **github-action:** update action renovatebot/github-action (v46.2.6 → v46.3.3) ([#58](https://github.com/ishioni/dexd/issues/58)) ([4204e76](https://github.com/ishioni/dexd/commit/4204e76e6d50cfbd8cf0be4059af0ec11b953797))
+* **github-action:** update action renovatebot/github-action (v46.3.3 → v46.3.4) ([#64](https://github.com/ishioni/dexd/issues/64)) ([c8b3e99](https://github.com/ishioni/dexd/commit/c8b3e991f487dfb8b88bbe291657fddf29d3a349))
+* **github-action:** update action renovatebot/github-action (v46.3.4 → v46.3.5) ([#65](https://github.com/ishioni/dexd/issues/65)) ([6b40fef](https://github.com/ishioni/dexd/commit/6b40fef0f2df14848b2f21a17996d1b3e956e11f))
+* **github-action:** update action renovatebot/github-action (v46.3.5 → v46.3.6) ([#67](https://github.com/ishioni/dexd/issues/67)) ([f73ce31](https://github.com/ishioni/dexd/commit/f73ce3102af988d7b1383fc13d3aff779ef2a68b))
+* **mise:** update tool golangci-lint (2.13.2 → 2.14.0) ([#63](https://github.com/ishioni/dexd/issues/63)) ([cde2f7c](https://github.com/ishioni/dexd/commit/cde2f7c1ba4c7a5c10982460a3a137936aa5b4e8))
+* **mise:** update tool lefthook (2.1.12 → 2.1.14) ([#59](https://github.com/ishioni/dexd/issues/59)) ([90d7659](https://github.com/ishioni/dexd/commit/90d76596d87ce94081a5a037a1b304e0a96a48a9))
+* **mise:** update tool lefthook (2.1.14 → 2.1.15) ([#68](https://github.com/ishioni/dexd/issues/68)) ([89f211b](https://github.com/ishioni/dexd/commit/89f211b06e2ba6a336c9839d849219265c33855e))
+* **mise:** update tool node (24.20.0 → v24.21.0) ([#53](https://github.com/ishioni/dexd/issues/53)) ([e9dc4da](https://github.com/ishioni/dexd/commit/e9dc4dab9f3ab7f71094ed5e6f368ac9bcc20386))
+* **mise:** update tool oxfmt (0.66.0 → 0.67.0) ([#55](https://github.com/ishioni/dexd/issues/55)) ([769910c](https://github.com/ishioni/dexd/commit/769910c5f0bdb3276d22909121ab6bd97dba369d))
+* **mise:** update tool oxfmt (0.67.0 → 0.68.0) ([#60](https://github.com/ishioni/dexd/issues/60)) ([fdc3ca4](https://github.com/ishioni/dexd/commit/fdc3ca4798e4e09bc67f1cfacb34bc85a2044494))
+* **mise:** update tool oxfmt (0.68.0 → 0.70.0) ([#62](https://github.com/ishioni/dexd/issues/62)) ([3878ae4](https://github.com/ishioni/dexd/commit/3878ae41c3f9d50f3d7013dd543979f12f17d6a0))
+* **mise:** update tool oxfmt (0.70.0 → 0.71.0) ([#66](https://github.com/ishioni/dexd/issues/66)) ([ce72f48](https://github.com/ishioni/dexd/commit/ce72f48020134b6e312d34baeab00695e92a0b22))
+* **mise:** update tool zizmor (1.30.0 → 1.30.1) ([#57](https://github.com/ishioni/dexd/issues/57)) ([ebfa53f](https://github.com/ishioni/dexd/commit/ebfa53f54c1bf0d75ed898b16624faa197488e78))
+
 ## [0.4.4](https://github.com/ishioni/dexd/compare/0.4.3...0.4.4) (2026-09-06)
 
 
