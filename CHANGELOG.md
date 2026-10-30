@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.4.6](https://github.com/ishioni/dexd/compare/0.4.5...0.4.6) (2026-10-30)
+
+
+### Miscellaneous Chores
+
+* **github-action:** update action jdx/mise-action (v5.2.2 → v5.2.3) ([#87](https://github.com/ishioni/dexd/issues/87)) ([43ca0b3](https://github.com/ishioni/dexd/commit/43ca0b38aafdec749886b1197f358293562695bf))
+* **github-action:** update action renovatebot/github-action (v46.3.9 → v46.3.10) ([#88](https://github.com/ishioni/dexd/issues/88)) ([2edb144](https://github.com/ishioni/dexd/commit/2edb144e62563340c03c72b4b9ce3c331325fdb4))
+* **github-action:** update github-actions ([#85](https://github.com/ishioni/dexd/issues/85)) ([5fc712f](https://github.com/ishioni/dexd/commit/5fc712febfb2f48dafc94483d4c98f71bb3a5cad))
+* **mise:** update tool node (24.22.1 → v24.22.2) ([#89](https://github.com/ishioni/dexd/issues/89)) ([3758997](https://github.com/ishioni/dexd/commit/3758997afe8a1d5de9e15b9b01b57819cb8df531))
+* **mise:** update tool oxfmt (0.74.0 → 0.75.0) ([#90](https://github.com/ishioni/dexd/issues/90)) ([3f71f66](https://github.com/ishioni/dexd/commit/3f71f66394530f95c08f85b0f935c7f4a7bc3270))
+
 ## [0.4.5](https://github.com/ishioni/dexd/compare/0.4.4...0.4.5) (2026-10-23)
 
 
