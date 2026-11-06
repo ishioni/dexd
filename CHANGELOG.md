@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.4.6](https://github.com/ishioni/dexd/compare/0.4.5...0.4.6) (2026-11-06)
+
+
+### Bug Fixes
+
+* **renovate:** renovate config moved ([c17a263](https://github.com/ishioni/dexd/commit/c17a263b44ec8a268da54e8681328d29c7b92075))
+
+
+### Miscellaneous Chores
+
+* **github-action:** update action jdx/mise-action (v5.2.2 → v5.2.3) ([#87](https://github.com/ishioni/dexd/issues/87)) ([43ca0b3](https://github.com/ishioni/dexd/commit/43ca0b38aafdec749886b1197f358293562695bf))
+* **github-action:** update action renovatebot/github-action (v46.3.9 → v46.3.10) ([#88](https://github.com/ishioni/dexd/issues/88)) ([2edb144](https://github.com/ishioni/dexd/commit/2edb144e62563340c03c72b4b9ce3c331325fdb4))
+* **github-action:** update github-actions ([#85](https://github.com/ishioni/dexd/issues/85)) ([5fc712f](https://github.com/ishioni/dexd/commit/5fc712febfb2f48dafc94483d4c98f71bb3a5cad))
+* **github-action:** update github-actions ([#91](https://github.com/ishioni/dexd/issues/91)) ([613c156](https://github.com/ishioni/dexd/commit/613c1564f767ec33ec13e645a16c71bdec8ac2a3))
+* **go:** update module github.com/caarlos0/env/v11 (v11.4.1 → v11.4.2) ([#93](https://github.com/ishioni/dexd/issues/93)) ([c0efd67](https://github.com/ishioni/dexd/commit/c0efd67bdcf86c55b91d6ae5bd5c49a4c5c00c6f))
+* **mise:** update tool node (24.22.1 → v24.22.2) ([#89](https://github.com/ishioni/dexd/issues/89)) ([3758997](https://github.com/ishioni/dexd/commit/3758997afe8a1d5de9e15b9b01b57819cb8df531))
+* **mise:** update tool node (24.22.2 → v26.13.0) ([#95](https://github.com/ishioni/dexd/issues/95)) ([6158649](https://github.com/ishioni/dexd/commit/6158649c4df2d3ce8bef0e01b72cdf3586496a1e))
+* **mise:** update tool oxfmt (0.74.0 → 0.75.0) ([#90](https://github.com/ishioni/dexd/issues/90)) ([3f71f66](https://github.com/ishioni/dexd/commit/3f71f66394530f95c08f85b0f935c7f4a7bc3270))
+* **mise:** update tool zizmor (1.31.1 → 1.32.0) ([#94](https://github.com/ishioni/dexd/issues/94)) ([f90d2ad](https://github.com/ishioni/dexd/commit/f90d2ad6bbcc83785c1727954e213fc039b77bf1))
+
 ## [0.4.5](https://github.com/ishioni/dexd/compare/0.4.4...0.4.5) (2026-10-23)
 
 
