@@ -3,7 +3,7 @@ module github.com/ishioni/dexd
 go 1.27.3
 
 require (
-	github.com/caarlos0/env/v11 v11.4.1
+	github.com/caarlos0/env/v11 v11.4.2
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/prometheus/client_golang v1.25.0
 )
